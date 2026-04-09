@@ -2,6 +2,17 @@ import { useState } from 'preact/hooks';
 import './personalization.css';
 import { FormEvent } from 'preact/compat';
 
+// 기존 import 문들 아래에 추가
+type WebMelonFirmwareSettings = {
+  nickname?: string;
+  message?: string;
+  language?: number;
+  color?: number;
+  birthday?: { month: number; day: number };
+  [key: string]: any;
+};
+
+
 export default function PersonalizationSettingsMenu() {
   const [firmwareSettings, setFirmwareSettings] = useState<WebMelonFirmwareSettings>(
     window.WebMelon.firmware.getFirmwareSettings()
@@ -86,7 +97,7 @@ export default function PersonalizationSettingsMenu() {
       <div className="birthday-selection">
         <div className="birthday-selector">
           <select className="select select-bordered w-full max-w-xs" onChange={setLanguage}>
-            {window.WebMelon.constants.FIRMWARE_LANGUAGES.map((language) => (
+            {(window.WebMelon.constants.FIRMWARE_LANGUAGES as any[]).map((language: any) => (
               <option
                 key={language.id}
                 selected={firmwareSettings.language === language.id}

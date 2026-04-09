@@ -23,10 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# These files should be imported through build scripts instead of being committed.
-public/static/webmelon.js
-public/static/wasmemulator.js
-public/static/wasmemulator.wasm
+
 
 # This should be added and updated automatically by scripts
 src/webmelon.d.ts

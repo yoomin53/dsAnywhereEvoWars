@@ -313,7 +313,7 @@
         return WebMelon._internal.emulatorNdsCart.loadFromFile(filename);
       },
       getUnloadedCartName: () => {
-        return WebMelon._internal.emulatorNdsCart.getCartName();
+        return WebMelon._internal.emulatorNdsCart.getCartTitle();
       },
       getUnloadedCartCode: () => {
         return WebMelon._internal.emulatorNdsCart.getCartCode();
@@ -784,8 +784,16 @@ async function autoLoadRom() {
     WebMelon.emulator.loadCart();
 
     // 10. Start emulation
-    WebMelon.emulator.startEmulation(TOP_SCREEN_CANVAS_ID, BOTTOM_SCREEN_CANVAS_ID);
-    console.log('Emulation started automatically!');
+    //WebMelon.emulator.startEmulation(TOP_SCREEN_CANVAS_ID, BOTTOM_SCREEN_CANVAS_ID);
+    //console.log('Emulation started automatically!');
+    if (window.__startEmulating) {
+
+      window.__startEmulating();
+
+    }
+
+    console.log('Auto-load ROM complete, signaling React to start emulation.');
+
 
   } catch (error) {
     console.error('Auto-load ROM failed:', error);

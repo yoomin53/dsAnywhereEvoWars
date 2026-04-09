@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks';
+import { useState, useEffect } from 'preact/hooks';
 import './main.css';
 import Emulator from './emulator';
 import Entrypoint from './entrypoint';
@@ -23,6 +23,16 @@ export function Main() {
   const onCloseSettings = () => {
     setSettingsOpen(false);
   };
+
+  // autoLoadRom에서 호출할 수 있도록 글로벌 콜백 등록
+  useEffect(() => {
+    (window as any).__startEmulating = () => {
+      setEmulating(true);
+    };
+    return () => {
+      delete (window as any).__startEmulating;
+    };
+  }, []);
 
   return (
     <>
