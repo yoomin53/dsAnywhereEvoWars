@@ -1,6 +1,6 @@
 export {};
 
-declare global {
+declare global {/*
   interface WebMelonFirmwareSettings {
     nickname?: string;
     message?: string;
@@ -8,7 +8,7 @@ declare global {
     color?: number;
     birthday?: { month: number; day: number };
     [key: string]: any;
-  }
+  }*/
 
   interface Window {
     WebMelon: any;
