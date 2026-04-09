@@ -2,4 +2,3 @@
 # to build and deploy to GitHub Pages
 action-runner/
 .DS_Store
-*.nds
