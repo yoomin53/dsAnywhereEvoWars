@@ -303,28 +303,33 @@
       }
     },
     cart: {
-      createCart: () => {
-        if (!WebMelon._internal.wasmLoaded) {
-          throw new Error('Cannot call createCart before WASM has loaded!');
+        createCart: () => {
+            if (!WebMelon._internal.wasmLoaded) {
+                throw new Error('Cannot call createCart before WASM has loaded!');
+            }
+            WebMelon._internal.emulatorNdsCart = new Module.WasmNdsCart();
+        },
+        loadFileIntoCart: (filename) => {
+            return WebMelon._internal.emulatorNdsCart.loadFromFile(filename);
+        },
+        getUnloadedCartName: function() {
+            try {
+                return WebMelon._internal.emulatorNdsCart.getCartName();
+            } catch (e) {
+                console.warn('getCartName not available');
+                return 'Unknown';
+            }
+        },
+        getUnloadedCartCode: function() {                    // ← 이것도 수정!
+            try {
+                return WebMelon._internal.emulatorNdsCart.getCartCode();
+            } catch (e) {
+                console.warn('getCartCode not available');
+                return 'XXXX';
+            }
         }
-        WebMelon._internal.emulatorNdsCart = new Module.WasmNdsCart();
-      },
-      loadFileIntoCart: (filename) => {
-        return WebMelon._internal.emulatorNdsCart.loadFromFile(filename);
-      },
-      getUnloadedCartName: function() {
-          try {
-              return WebMelon._internal.emulatorNdsCart.getCartName();
-          } catch (e) {
-              console.warn('getCartName not available');
-              return 'Unknown';
-          }
-      },
-
-      getUnloadedCartCode: () => {
-        return WebMelon._internal.emulatorNdsCart.getCartCode();
-      }
     },
+
     storage: {
       createDirectory: (path) => {
         // Check if exists first
