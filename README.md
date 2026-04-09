@@ -31,7 +31,7 @@ ds-anywhere-homebrew/
 ├── bridge/                   # TypeScript <-> WASM bridge SDK
 ├── frontend/
 │   ├── public/
-│   │   └── game.nds          # Your homebrew ROM
+│   │   └── EvoWars_demo.nds          # my homebrew ROM
 │   ├── src/
 │   │   ├── App.tsx           # Simplified auto-launch UI
 │   │   └── emulator.ts       # Fetches and loads the ROM on startup
@@ -52,13 +52,13 @@ ds-anywhere-homebrew/
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/ds-anywhere-homebrew.git
+   git clone https://github.com/yoomin53/dsAnywhereEvoWars
    cd ds-anywhere-homebrew
    ```
 
-2. Place your homebrew `.nds` ROM in the static assets directory:
+2. Place your homebrew `.nds` ROM in the static assets directory, in my case it is "EvoWars_demo.nds":
    ```bash
-   cp /path/to/your/game.nds frontend/public/game.nds
+   cp /path/to/your/game.nds frontend/public/EvoWars_demo.nds
    ```
 
 3. Build the WASM emulator core:
