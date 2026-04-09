@@ -312,9 +312,15 @@
       loadFileIntoCart: (filename) => {
         return WebMelon._internal.emulatorNdsCart.loadFromFile(filename);
       },
-      getUnloadedCartName: () => {
-        return WebMelon._internal.emulatorNdsCart.getCartTitle();
+      getUnloadedCartName: function() {
+          try {
+              return WebMelon._internal.emulatorNdsCart.getCartName();
+          } catch (e) {
+              console.warn('getCartName not available');
+              return 'Unknown';
+          }
       },
+
       getUnloadedCartCode: () => {
         return WebMelon._internal.emulatorNdsCart.getCartCode();
       }
