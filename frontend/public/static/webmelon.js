@@ -734,37 +734,35 @@ async function autoLoadRom() {
 // ROM_PATH: 가상 파일시스템 경로 → 항상 고정! 바꾸면 안 됨
 const ROM_PATH = '/rom/EvoWars_demo.nds';
 
-// ROM_URL: 웹 서버에서 다운로드할 URL → 환경에 따라 변경
 const IS_GITHUB_PAGES = window.location.pathname.includes('/dsAnywhereEvoWars');
 const BASE = IS_GITHUB_PAGES ? '/dsAnywhereEvoWars/' : '/';
 const ROM_URL = BASE + 'rom/EvoWars_demo.nds';
 
-  const TOP_SCREEN_CANVAS_ID = 'top-screen';       // Change to match your HTML canvas IDs
-  const BOTTOM_SCREEN_CANVAS_ID = 'bottom-screen'; // Change to match your HTML canvas IDs
+const TOP_SCREEN_CANVAS_ID = 'top-screen';
+const BOTTOM_SCREEN_CANVAS_ID = 'bottom-screen';
 
-  try {
-    // 1. Prepare the virtual filesystem (firmware + savefiles directories)
+try {
+    // 1. Prepare the virtual filesystem
     WebMelon.storage.prepareVirtualFilesystem();
 
     // 2. Wait for virtual filesystem to be ready
     await new Promise((resolve) => {
-      WebMelon.storage.onPrepare(() => {
-        resolve();
-      });
+        WebMelon.storage.onPrepare(() => {
+            resolve();
+        });
     });
 
     // 3. Fetch the ROM file from the server
     console.log('Fetching ROM from:', ROM_URL);
     const response = await fetch(ROM_URL);
     if (!response.ok) {
-      throw new Error(`Failed to fetch ROM: ${response.status} ${response.statusText}`);
+        throw new Error(`Failed to fetch ROM: ${response.status} ${response.statusText}`);
     }
     const romArrayBuffer = await response.arrayBuffer();
     const romData = new Uint8Array(romArrayBuffer);
     console.log('ROM fetched successfully, size:', romData.length, 'bytes');
 
     // 4. Write the ROM into the Emscripten virtual filesystem
-    //    Create the /rom directory if it doesn't exist
     WebMelon.storage.createDirectory('/rom');
     WebMelon.storage.write(ROM_PATH, romData);
     console.log('ROM written to virtual filesystem at:', ROM_PATH);
@@ -773,36 +771,50 @@ const ROM_URL = BASE + 'rom/EvoWars_demo.nds';
     WebMelon.cart.createCart();
     const loaded = WebMelon.cart.loadFileIntoCart(ROM_PATH);
     if (!loaded) {
-      throw new Error('Failed to load ROM file into cart.');
+        throw new Error('Failed to load ROM file into cart.');
     }
-    console.log('Cart loaded:', WebMelon.cart.getUnloadedCartName(), WebMelon.cart.getUnloadedCartCode());
 
-    // 6. Create the emulator instance
+    // 6. 카트 이름/코드 안전하게 가져오기
+    let cartName = 'Unknown';
+    let cartCode = 'XXXX';
+
+    try {
+        cartName = WebMelon.cart.getUnloadedCartName();
+    } catch (e) {
+        cartName = ROM_PATH.split('/').pop().replace('.nds', '');
+        console.warn('getUnloadedCartName failed, using filename:', cartName);
+    }
+
+    try {
+        cartCode = WebMelon.cart.getUnloadedCartCode();
+    } catch (e) {
+        cartCode = 'EVOW';
+        console.warn('getUnloadedCartCode failed, using fallback:', cartCode);
+    }
+
+    console.log('Cart loaded:', cartName, cartCode);
+
+    // 7. Create the emulator instance
     WebMelon.emulator.createEmulator();
 
-    // 7. Set save path for save files
-    const cartCode = WebMelon.cart.getUnloadedCartCode();
+    // 8. Set save path for save files
     WebMelon.emulator.setSavePath('/savefiles/' + cartCode + '.sav');
 
-    // 8. Load FreeBIOS (no official BIOS needed)
+    // 9. Load FreeBIOS
     WebMelon.emulator.loadFreeBIOS();
 
-    // 9. Load the cart into the emulator
+    // 10. Load the cart into the emulator
     WebMelon.emulator.loadCart();
 
-    // 10. Start emulation
-    //WebMelon.emulator.startEmulation(TOP_SCREEN_CANVAS_ID, BOTTOM_SCREEN_CANVAS_ID);
-    //console.log('Emulation started automatically!');
+    // 11. Start emulation
     if (window.__startEmulating) {
-
-      window.__startEmulating();
-
+        window.__startEmulating();
     }
 
     console.log('Auto-load ROM complete, signaling React to start emulation.');
 
-
-  } catch (error) {
+} catch (error) {
     console.error('Auto-load ROM failed:', error);
-  }
+}
+
 }
