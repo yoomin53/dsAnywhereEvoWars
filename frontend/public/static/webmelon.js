@@ -730,8 +730,15 @@ window.Module = {
 };
 
 async function autoLoadRom() {
-  const ROM_PATH = '/rom/EvoWars_demo.nds';
-  const ROM_URL = 'rom/EvoWars_demo.nds'; // Relative URL to where you host the .nds file
+  // 현재 URL에서 자동 판별
+// ROM_PATH: 가상 파일시스템 경로 → 항상 고정! 바꾸면 안 됨
+const ROM_PATH = '/rom/EvoWars_demo.nds';
+
+// ROM_URL: 웹 서버에서 다운로드할 URL → 환경에 따라 변경
+const IS_GITHUB_PAGES = window.location.pathname.includes('/dsAnywhereEvoWars');
+const BASE = IS_GITHUB_PAGES ? '/dsAnywhereEvoWars/' : '/';
+const ROM_URL = BASE + 'rom/EvoWars_demo.nds';
+
   const TOP_SCREEN_CANVAS_ID = 'top-screen';       // Change to match your HTML canvas IDs
   const BOTTOM_SCREEN_CANVAS_ID = 'bottom-screen'; // Change to match your HTML canvas IDs
 
