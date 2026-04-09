@@ -1,54 +1,136 @@
-# 🎮 DS Anywhere
 
-DS Anywhere allows you to emulate a Nintendo DS directly inside your web browser using [Emscripten](https://emscripten.org/)'s
-LLVM WebAssembly compiler. The project contains a fork of the [melonDS](https://github.com/melonds-emu/melonds) emulator, a
-bridge SDK to connect the WebAssembly to the frontend using TypeScript bindings, and a TypeScript Preact/Vite frontend that
-provides the User Interface for the emulator. It also contains a suite of CI/CD tools to manage deploying changes automatically
-to GitHub Pages.
 
-Emulators usually use a lot of low-level memory logic to achieve fast runtimes and compatibility across many different types of
-ROMs. However, using this comes at the cost of untrusted ROMs or players being able to potentially execute arbitrary code on the
-host machines if they discover vulnerabilities in the core emulator. DS Anywhere allows you to run a ROM directly inside your 
-web browser without having to worry about potential security issues affecting your main computer, since it limits the scope of
-potential access to a single webpage rather than your entire machine.
+# 🎮 DS Anywhere: Homebrew Edition
 
-**[Try it out!](https://brxxn.github.io/ds-anywhere)**
+A web-based Nintendo DS emulator that launches your homebrew NDS game instantly in the browser. Built on a fork of [DS Anywhere](https://github.com/brxxn/ds-anywhere), which uses [Emscripten](https://emscripten.org/) to compile the [melonDS](https://github.com/melonds-emu/melonds) emulator core to WebAssembly. The frontend is built with TypeScript, Preact, and Vite.
 
-## 🚧 Development notice
+Players visit your site and the game starts automatically; no ROM uploads, no setup, no friction.
 
-Please note that DS Anywhere is still under development and is very much a Work-In-Progress project. Many features
-are unstable or incomplete.
+## ✨ Features
 
-This emulator should *only* be used to emulate legally acquired ROM and BIOS files. This emulator should not be used to violate
-or evade software copyright restrictions. Additionally, please be careful not to share ROM and BIOS files with anyone else
-unless you are legally authorized to do so. To ensure copyright protections are not violated, the gitignore file should
-prevent any `*.nds` files from being committed to this repository. Contributors are also encouraged to also manually ensure they
-do not unknowingly distribute copyrighted files by reviewing commits before they push them. Contributers who attempt to push
-copyrighted files will be banned from the repository.
+- **Instant Play**: The homebrew ROM is bundled as a static asset and loads automatically on page visit.
+- **Browser-Sandboxed**: All emulation runs inside a WebAssembly sandbox in the browser, so there are no security risks to the host machine.
+- **No Installation Required**: Works on any modern browser with WebAssembly support. Nothing to download.
+- **Mobile Friendly**: On-screen touch controls for mobile devices.
+- **Gamepad Support**: Plug in a controller and play with physical buttons.
 
-Additionally, this project is a *personal project*, meaning active development and contributions should *not* be expected. I
-also do not accept funding of any type through any channel for this project, but code contributions and pull requests are 
-welcome!
+## 🛠️ Tech Stack
 
-## To-do List
+| Layer | Technology |
+|---|---|
+| Emulator Core | melonDS (C++), compiled to WASM via Emscripten |
+| Bridge SDK | TypeScript bindings connecting WASM to the frontend |
+| Frontend | Preact + TypeScript + Vite |
+| Deployment | GitHub Pages via CI/CD |
 
-This list is incomplete, but it contains a few goals I would like to get done on this project in the future.
+## 📁 Project Structure
 
-- **Build instructions**: To let other people build the project, they'd likely want some build instructions as well as a guide
-for how to use `./buildtools.py`.
-- **Controller support**: While using a controller is already supported, being able to change bindings in the UI would help,
-especially for controllers that have different buttons than the default is configured to (such as XY/AB being swapped).
-- **Documentation**: More documentation is definitely needed, since many things are unclear or do not work as labeled. Some
-refactoring may also be needed as well.
-- **Savefile Backup**: There is currently no way to backup save files or load from a previous save file. This needs to be
-implemented, since currently the browser can evict our IndexedDB storage of savefiles at any time (and likely will arbitrarily
-kick us out given the amount of data we use).
-- **Cheat code support**: Many people use cheat codes to improve performance on games or bypass bugs caused by the emulator, so
-having the ability to support cheat codes for these players would be nice.
-- **Multiplayer Support**: Multiplayer requires extremely low latency (most games expect ~5ms response times) in order to work,
-but it's worth a shot to enable multiplayer support anyways. It likely will not work for reliable multiplayer gaming, but it may
-work to allow data transfers or ROMs that support connections that aren't as fast. To do this, we will need a protocol that runs
-over WebSocket connections.
-- **Themes**: The frontend UI has support for many different themes, but I haven't built a setting to change them yet, as it 
-would require I test each theme to ensure everything works. There are also some parts of the UI that are incorrectly colored
-on certain themes.
+```
+ds-anywhere-homebrew/
+├── melonds/                  # melonDS fork (compiled to WASM)
+├── bridge/                   # TypeScript <-> WASM bridge SDK
+├── frontend/
+│   ├── public/
+│   │   └── game.nds          # Your homebrew ROM
+│   ├── src/
+│   │   ├── App.tsx           # Simplified auto-launch UI
+│   │   └── emulator.ts       # Fetches and loads the ROM on startup
+│   └── index.html
+├── buildtools.py             # Build toolchain helper script
+└── README.md
+```
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- [Python 3](https://www.python.org/)
+- [Emscripten SDK](https://emscripten.org/docs/getting_started/downloads.html)
+- [Node.js](https://nodejs.org/) (v18+)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/ds-anywhere-homebrew.git
+   cd ds-anywhere-homebrew
+   ```
+
+2. Place your homebrew `.nds` ROM in the static assets directory:
+   ```bash
+   cp /path/to/your/game.nds frontend/public/game.nds
+   ```
+
+3. Build the WASM emulator core:
+   ```bash
+   python3 buildtools.py build
+   ```
+
+4. Install frontend dependencies and start the dev server:
+   ```bash
+   cd frontend
+   npm install
+   npm run dev
+   ```
+
+5. Open `http://localhost:5173` in your browser. The game should start automatically.
+
+### Production Build
+
+```bash
+cd frontend
+npm run build
+```
+
+The output in `frontend/dist/` is a fully static site ready to be deployed to GitHub Pages, Netlify, Vercel, or any static hosting provider.
+
+## ⚙️ Configuration
+
+You can customize the experience by editing `frontend/src/config.ts`:
+
+| Option | Description | Default |
+|---|---|---|
+| `ROM_PATH` | Path to the `.nds` file relative to `public/` | `EvoWars_demo.nds` |
+| `AUTO_START` | Start emulation immediately on page load | `true` |
+| `SHOW_CONTROLS` | Show on-screen touch controls on mobile | `true` |
+| `DEFAULT_SCALE` | Initial display scale multiplier | `2` |
+
+## 🎮 Controls
+
+### Keyboard
+
+| Key | DS Button |
+|---|---|
+| Arrow Keys | D-Pad |
+| X | A |
+| Z | B |
+| A | Y |
+| S | X |
+| Enter | Start |
+| Shift | Select |
+| Q | L |
+| W | R |
+
+### Gamepad
+
+Any standard gamepad is supported with default mappings. Custom bindings are planned for a future release.
+
+## 📋 To-Do
+
+- [ ] Custom controller binding UI
+- [ ] Save file export and import
+- [ ] Cheat code support
+- [ ] Theme selector
+- [ ] Performance tuning for lower-end devices
+
+## 📄 License
+
+This project is built on [DS Anywhere](https://github.com/brxxn/ds-anywhere) and [melonDS](https://github.com/melonds-emu/melonds). Please refer to their respective repositories for licensing details.
+
+This site is intended **only** for use with homebrew or otherwise freely distributable NDS software. Do not use it to distribute copyrighted ROMs.
+
+## 🙏 Acknowledgments
+
+- [melonDS](https://github.com/melonds-emu/melonds) for the excellent DS emulator core
+- [DS Anywhere](https://github.com/brxxn/ds-anywhere) for the original browser-based emulation project
+- [Emscripten](https://emscripten.org/) for making C++ to WebAssembly compilation possible
